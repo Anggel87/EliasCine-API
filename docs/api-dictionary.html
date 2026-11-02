@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diccionario de Endpoints - Eliasib Cine API</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--head:#334155;--text:#f8fafc;--muted:#94a3b8;--a:#38bdf8;--ok:#34d399;--warn:#fbbf24;--err:#f87171;--border:#334155}
+*{box-sizing:border-box}body{margin:0;padding:2.5rem 1.5rem;background:var(--bg);color:var(--text);font:15px/1.6 Inter,Segoe UI,sans-serif}.container{max-width:1200px;margin:auto}
+header{display:flex;justify-content:space-between;align-items:end;gap:1rem;flex-wrap:wrap;padding-bottom:1.5rem;margin-bottom:2rem;border-bottom:1px solid var(--border)}h1{margin:0;font-size:2rem}h1 span,h2,h3,code,.route{color:var(--a)}p,li{color:var(--muted)}.badges{display:flex;gap:.5rem;flex-wrap:wrap}.badge{border:1px solid var(--border);background:var(--card);padding:.35rem .75rem;border-radius:99px;color:var(--muted);font-size:.82rem}.badge strong{color:var(--text)}
+nav,.card{background:var(--card);border:1px solid var(--border);border-radius:.75rem;margin-bottom:1.5rem;overflow:hidden}nav{padding:1rem}nav a{color:var(--a);background:#164e6333;padding:.3rem .65rem;margin:.2rem;border-radius:.35rem;text-decoration:none;display:inline-block}.card h2{margin:0;padding:1rem 1.25rem;background:#33415566;border-bottom:1px solid var(--border);font-size:1.15rem}.body{padding:1.25rem}.table{overflow:auto}table{width:100%;border-collapse:collapse;min-width:760px}th,td{text-align:left;padding:.7rem .8rem;border-bottom:1px solid #33415599;vertical-align:top}th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.route,code{font-family:Consolas,monospace}.get{color:var(--ok);font-weight:700}.post{color:var(--warn);font-weight:700}.put{color:var(--a);font-weight:700}.delete{color:var(--err);font-weight:700}.required{color:var(--err);font-weight:700}.optional{color:var(--ok)}.example{background:#0b1220;border:1px solid var(--border);border-radius:.5rem;padding:1rem;overflow:auto;color:#cbd5e1}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}.pill{display:inline-block;padding:.1rem .45rem;margin:.1rem;border-radius:.3rem;background:#0e749033;color:#bae6fd;font-family:Consolas,monospace;font-size:.82rem}
+@media print{body{background:#fff;color:#111}.card,nav{background:#fff;border-color:#cbd5e1}.card h2{background:#f1f5f9}.example{background:#f8fafc;color:#111}nav{display:none}h1,h2,h3,code,.route{color:#0369a1}}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<div><h1>Diccionario de Endpoints: <span>Eliasib Cine API</span></h1><p>Contrato REST para conectar el frontend con la base de datos peliculasdb.</p></div>
+<div class="badges"><span class="badge">FastAPI</span><span class="badge">JSON</span><span class="badge">Prefijo <strong>/api</strong></span><span class="badge">8 recursos</span></div>
+</header>
+<nav><strong>Índice rápido</strong><br>
+<a href="#reglas">Reglas generales</a><a href="#crud">Operaciones</a><a href="#movies">movies</a><a href="#catalogos">Catálogos</a><a href="#users">users</a><a href="#cine">Salas y funciones</a><a href="#tickets">tickets</a><a href="#errores">Errores</a>
+</nav>
+<section id="reglas" class="card"><h2>1. Reglas generales de la API</h2><div class="body grid">
+<div><h3>Entrada</h3><ul><li>Los cuerpos se envían como <code>application/json</code>.</li><li>Los ids se envían en la URL y deben ser enteros positivos.</li><li>En listas: <code>skip</code> es opcional, mínimo 0.</li><li>En listas: <code>limit</code> es opcional, de 1 a 100; valor predeterminado 100.</li></ul></div>
+<div><h3>Salida</h3><ul><li>Las listas devuelven un arreglo JSON.</li><li>GET individual, POST y PUT devuelven un objeto JSON.</li><li>DELETE devuelve <code>{ message, id }</code>.</li><li>La propiedad <code>password</code> nunca aparece en respuestas.</li></ul></div>
+</div></section>
+<section id="crud" class="card"><h2>2. Operaciones disponibles para cada recurso</h2><div class="body table"><table><thead><tr><th>Método</th><th>Ruta</th><th>Cuerpo</th><th>Respuesta exitosa</th></tr></thead><tbody>
+<tr><td class="get">GET</td><td class="route">/api/{recurso}</td><td>Ninguno. Query opcional: skip, limit.</td><td>200: arreglo de registros.</td></tr>
+<tr><td class="get">GET</td><td class="route">/api/{recurso}/{id}</td><td>Ninguno. id obligatorio en URL.</td><td>200: registro solicitado.</td></tr>
+<tr><td class="post">POST</td><td class="route">/api/{recurso}</td><td>Campos obligatorios y opcionales según la tabla del recurso.</td><td>201: registro creado con id.</td></tr>
+<tr><td class="put">PUT</td><td class="route">/api/{recurso}/{id}</td><td>Se envía el cuerpo completo del recurso.</td><td>200: registro actualizado.</td></tr>
+<tr><td class="delete">DELETE</td><td class="route">/api/{recurso}/{id}</td><td>Ninguno. id obligatorio en URL.</td><td>200: confirmación de eliminación.</td></tr>
+</tbody></table></div></section>
+<section id="movies" class="card"><h2>3. movies</h2><div class="body table"><table><thead><tr><th>Campo</th><th>POST / PUT</th><th>Tipo</th><th>Validación</th><th>Respuesta</th></tr></thead><tbody>
+<tr><td><code>title</code></td><td class="required">Obligatorio</td><td>string</td><td>Máximo 75 caracteres.</td><td>Se devuelve.</td></tr>
+<tr><td><code>director_id</code></td><td class="optional">Opcional</td><td>integer / null</td><td>Debe existir en directors si se envía.</td><td>Se devuelve.</td></tr>
+<tr><td><code>length</code></td><td class="optional">Opcional</td><td>integer / null</td><td>Mayor o igual a 0. Minutos.</td><td>Se devuelve.</td></tr>
+<tr><td><code>category_id</code></td><td class="optional">Opcional</td><td>integer / null</td><td>Debe existir en categories si se envía.</td><td>Se devuelve.</td></tr>
+<tr><td><code>movie_summary</code></td><td class="optional">Opcional</td><td>string / null</td><td>Máximo 255 caracteres.</td><td>Se devuelve.</td></tr>
+<tr><td><code>image</code></td><td class="optional">Opcional</td><td>string / null</td><td>Máximo 255 caracteres; puede ser URL.</td><td>Se devuelve.</td></tr>
+</tbody></table></div><div class="body"><h3>Ejemplo</h3><pre class="example">POST /api/movies
+{ "title":"Dune", "director_id":1, "length":155, "category_id":1,
+  "movie_summary":"Una historia...", "image":"https://sitio/poster.jpg" }
+
+Respuesta 201
+{ "id":1, "title":"Dune", "director_id":1, "length":155,
+  "category_id":1, "movie_summary":"Una historia...",
+  "image":"https://sitio/poster.jpg" }</pre></div></section>
+<section id="catalogos" class="card"><h2>4. directors, categories y auditoriums</h2><div class="body table"><table><thead><tr><th>Recurso</th><th>Ruta base</th><th>Campo obligatorio</th><th>Validación</th><th>Respuesta</th></tr></thead><tbody>
+<tr><td>Directores</td><td class="route">/api/directors</td><td><code>name</code></td><td>string; máximo 50 caracteres en directors.</td><td><code>{ id, name }</code></td></tr>
+<tr><td>Categorías</td><td class="route">/api/categories</td><td><code>name</code></td><td>string; máximo 25 caracteres en categories.</td><td><code>{ id, name }</code></td></tr>
+<tr><td>Salas</td><td class="route">/api/auditoriums</td><td><code>name</code></td><td>string; máximo 75 caracteres en auditoriums.</td><td><code>{ id, name }</code></td></tr>
+</tbody></table></div><div class="body"><pre class="example">POST /api/categories
+{ "name":"Ciencia ficción" }
+
+Respuesta 201
+{ "id":1, "name":"Ciencia ficción" }</pre></div></section>
+<section id="users" class="card"><h2>5. users</h2><div class="body table"><table><thead><tr><th>Campo</th><th>POST / PUT</th><th>Tipo</th><th>Validación</th><th>Respuesta</th></tr></thead><tbody>
+<tr><td><code>name</code></td><td class="required">Obligatorio</td><td>string</td><td>Máximo 75 caracteres.</td><td>Se devuelve.</td></tr>
+<tr><td><code>email</code></td><td class="required">Obligatorio</td><td>string</td><td>Máximo 75 caracteres; debe ser único.</td><td>Se devuelve.</td></tr>
+<tr><td><code>password</code></td><td class="required">Obligatorio</td><td>string</td><td>Entre 1 y 255 caracteres.</td><td><strong>No se devuelve.</strong></td></tr>
+</tbody></table></div><div class="body"><pre class="example">POST /api/users
+{ "name":"Ana", "email":"ana@example.com", "password":"secreto" }
+
+Respuesta 201
+{ "id":1, "name":"Ana", "email":"ana@example.com" }</pre></div></section>
+<section id="cine" class="card"><h2>6. seats y movie-screenings</h2><div class="body table"><table><thead><tr><th>Recurso</th><th>Campo</th><th>Obligatorio</th><th>Validación</th><th>Respuesta</th></tr></thead><tbody>
+<tr><td rowspan="3">seats<br><span class="route">/api/seats</span></td><td><code>seat_number</code></td><td class="required">Sí</td><td>integer mayor o igual a 0.</td><td rowspan="3">id + campos enviados.</td></tr>
+<tr><td><code>row_label</code></td><td class="optional">No</td><td>string de máximo 2 caracteres o null.</td></tr>
+<tr><td><code>auditorium_id</code></td><td class="required">Sí</td><td>Debe existir en auditoriums.</td></tr>
+<tr><td rowspan="3">movie-screenings<br><span class="route">/api/movie-screenings</span></td><td><code>date</code></td><td class="required">Sí</td><td>Fecha y hora ISO 8601.</td><td rowspan="3">id + campos enviados.</td></tr>
+<tr><td><code>movie_id</code></td><td class="required">Sí</td><td>Debe existir en movies.</td></tr>
+<tr><td><code>auditorium_id</code></td><td class="required">Sí</td><td>Debe existir en auditoriums.</td></tr>
+</tbody></table></div></section>
+<section id="tickets" class="card"><h2>7. tickets</h2><div class="body table"><table><thead><tr><th>Campo</th><th>POST / PUT</th><th>Tipo</th><th>Validación</th></tr></thead><tbody>
+<tr><td><code>user_id</code></td><td class="required">Obligatorio</td><td>integer</td><td>Debe existir en users.</td></tr>
+<tr><td><code>seat_id</code></td><td class="required">Obligatorio</td><td>integer</td><td>Debe existir en seats.</td></tr>
+<tr><td><code>movie_screening_id</code></td><td class="required">Obligatorio</td><td>integer</td><td>Debe existir en movie_screenings.</td></tr>
+<tr><td><code>price</code></td><td class="optional">Opcional</td><td>decimal / null</td><td>Mayor o igual a 0; máximo DECIMAL(8,2).</td></tr>
+</tbody></table></div><div class="body"><p>La combinación <code>movie_screening_id + seat_id</code> es única. Si se intenta vender dos veces el mismo asiento para la misma función, la API responde <code>409</code>.</p><pre class="example">POST /api/tickets
+{ "user_id":1, "seat_id":1, "movie_screening_id":1, "price":89.50 }
+
+Respuesta 201
+{ "id":1, "user_id":1, "seat_id":1,
+  "movie_screening_id":1, "price":"89.50" }</pre></div></section>
+<section id="errores" class="card"><h2>8. Errores y rutas auxiliares</h2><div class="body table"><table><thead><tr><th>Código</th><th>Cuándo ocurre</th><th>Formato</th></tr></thead><tbody>
+<tr><td>200</td><td>Consulta, actualización o eliminación correcta.</td><td>Objeto, arreglo o mensaje.</td></tr>
+<tr><td>201</td><td>Registro creado.</td><td>Objeto creado con id.</td></tr>
+<tr><td>404</td><td>El id no existe.</td><td><code>{ "detail":"Registro no encontrado" }</code></td></tr>
+<tr><td>409</td><td>FK inexistente, email duplicado, asiento duplicado o eliminación con dependencias.</td><td><code>{ "detail":"..." }</code></td></tr>
+<tr><td>422</td><td>Falta un campo obligatorio o no cumple su tipo/validación.</td><td>Detalle estándar de FastAPI.</td></tr>
+</tbody></table></div><div class="body"><p><code>GET /health</code> → <code>{ "status":"ok" }</code> · <code>GET /docs</code> → Swagger UI · <code>GET /redoc</code> → ReDoc</p></div></section>
+</div>
+</body>
+</html>

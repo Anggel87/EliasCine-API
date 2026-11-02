@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: peliculasdb-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-peliculasdb}
+      MYSQL_USER: ${MYSQL_USER:-cine_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-cine_password}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+    ports:
+      # 3306 suele estar ocupado por una instalación local de MySQL.
+      # Desde la computadora se accede por localhost:3307;
+      # entre contenedores MySQL sigue escuchando en 3306.
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: .
+    container_name: eliasib-cine-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER:-cine_user}:${MYSQL_PASSWORD:-cine_password}@mysql:3306/${MYSQL_DATABASE:-peliculasdb}
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

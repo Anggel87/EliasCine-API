@@ -1,42 +1,38 @@
 # Eliasib Cine API
 
-Backend base para una aplicación móvil de películas, directores y categorías.
+API REST para películas, cartelera, salas, asientos, usuarios y boletos sobre MySQL peliculasdb.
 
-## Ejecutar con Docker
+## Ejecutar con Docker Compose
 
-Requiere [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+Requiere Docker Desktop.
 
-```bash
-docker build -t eliasib-cine-api .
-docker run --rm -p 8000:8000 eliasib-cine-api
-```
+    docker compose up --build
 
-## Ejecutar con Python
+Este comando construye la API y levanta los dos contenedores:
 
-```bash
-python -m venv .venv
+- API: http://localhost:8000
+- MySQL Docker: localhost:3307
 
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
+El esquema database/schema.sql se ejecuta automáticamente al crear el volumen de MySQL.
 
-python -m pip install -r requirements.txt
-fastapi dev app/main.py
-```
+Para detener los contenedores:
 
-Requiere Python 3.11+ para la instalación local.
+    docker compose down
 
-## Documentación y endpoints
+Para reiniciar la base desde cero, eliminando sus datos:
 
-- Swagger UI: <http://127.0.0.1:8000/docs>
-- ReDoc: <http://127.0.0.1:8000/redoc>
-- Health check: `GET /health`
-- Películas: `GET /api/movies`, `GET /api/movies/{id}`, `POST /api/movies`
-- Directores: `GET /api/directors`, `GET /api/directors/{id}`, `POST /api/directors`
-- Categorías: `GET /api/categories`, `GET /api/categories/{id}`, `POST /api/categories`
+    docker compose down -v
+    docker compose up --build
 
-## GitHub
+## Rutas útiles
 
-```bash
-git clone https://github.com/Anggel87/EliasCine-API.git
-cd EliasCine-API
-```
+- Swagger: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health check: GET /health
+- API: /api
+
+Cada recurso expone GET, GET /{id}, POST, PUT /{id} y DELETE /{id}.
+
+Recursos: movies, directors, categories, users, auditoriums, seats, movie-screenings y tickets.
+
+Documentación detallada: docs/api-dictionary.html.

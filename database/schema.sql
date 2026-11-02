@@ -1,25 +1,33 @@
-CREATE DATABASE IF NOT EXISTS cine_db;
-USE cine_db;
+CREATE DATABASE IF NOT EXISTS peliculasdb;
+USE peliculasdb;
 
-CREATE TABLE IF NOT EXISTS directores (
-    id_director INT AUTO_INCREMENT PRIMARY KEY,
-    director VARCHAR(150) NOT NULL
+CREATE TABLE directors (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL);
+CREATE TABLE categories (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(25) NOT NULL);
+CREATE TABLE movies (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, title VARCHAR(75) NOT NULL,
+    director_id BIGINT UNSIGNED, length SMALLINT UNSIGNED, category_id BIGINT UNSIGNED,
+    movie_summary VARCHAR(255), image VARCHAR(255),
+    FOREIGN KEY (director_id) REFERENCES directors(id), FOREIGN KEY (category_id) REFERENCES categories(id)
 );
-
-CREATE TABLE IF NOT EXISTS categorias (
-    identificador INT AUTO_INCREMENT PRIMARY KEY,
-    categoria VARCHAR(100) NOT NULL
+CREATE TABLE users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(75) NOT NULL,
+    email VARCHAR(75) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL
 );
-
-CREATE TABLE IF NOT EXISTS peliculas (
-    identificador INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(200) NOT NULL,
-    id_director INT NOT NULL,
-    duracion INT NOT NULL,
-    id_categoria INT NOT NULL,
-    sinopsis TEXT NOT NULL,
-    CONSTRAINT fk_peliculas_director
-        FOREIGN KEY (id_director) REFERENCES directores (id_director),
-    CONSTRAINT fk_peliculas_categoria
-        FOREIGN KEY (id_categoria) REFERENCES categorias (identificador)
+CREATE TABLE auditoriums (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(75) NOT NULL);
+CREATE TABLE seats (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, seat_number SMALLINT UNSIGNED NOT NULL,
+    row_label CHAR(2), auditorium_id BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (auditorium_id) REFERENCES auditoriums(id)
+);
+CREATE TABLE movie_screenings (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, date DATETIME NOT NULL,
+    movie_id BIGINT UNSIGNED NOT NULL, auditorium_id BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (movie_id) REFERENCES movies(id), FOREIGN KEY (auditorium_id) REFERENCES auditoriums(id)
+);
+CREATE TABLE tickets (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id BIGINT UNSIGNED NOT NULL,
+    seat_id BIGINT UNSIGNED NOT NULL, movie_screening_id BIGINT UNSIGNED NOT NULL,
+    price DECIMAL(8,2), FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (seat_id) REFERENCES seats(id), FOREIGN KEY (movie_screening_id) REFERENCES movie_screenings(id),
+    UNIQUE KEY uk_screening_seat (movie_screening_id, seat_id)
 );
