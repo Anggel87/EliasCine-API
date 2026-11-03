@@ -36,3 +36,13 @@ Cada recurso expone GET, GET /{id}, POST, PUT /{id} y DELETE /{id}.
 Recursos: movies, directors, categories, users, auditoriums, seats, movie-screenings y tickets.
 
 Documentación detallada: docs/api-dictionary.html.
+
+## Poblar datos de prueba
+
+Con los contenedores levantados, ejecuta este comando:
+
+    docker compose run --rm api python -m app.seed
+
+El seeder es idempotente: puedes ejecutarlo nuevamente sin duplicar los datos básicos. Incluye 10 películas Marvel, sus pósters locales en assets/movies, directores, categorías, usuarios demo, salas, asientos, funciones y boletos.
+
+Diccionario de datos generados: docs/seed-dictionary.html.
